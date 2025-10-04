@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reto Funcional 30 Días - Temporizador</title>
+    <!-- 0. Favicon para la pestaña del navegador -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 6V4a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v2M5 6h4M19 6h-4M5 6l2 2m12-2l-2 2M7 8h10M7 8a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2M12 22a2 2 0 0 0 2-2v-2h-4v2a2 2 0 0 0 2 2z'/%3E%3C/svg%3E">
+
     <!-- 1. Carga de Google Font 'Inter' para garantizar la tipografía en todos los modos -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     
@@ -137,9 +140,41 @@
             background-color: #374151; /* gray-700 */
             color: white;
         }
+
+        /* --- ESTILO DE PANTALLA DE PRECARGA (SPLASH SCREEN) --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f3f4f6; /* Fondo claro por defecto */
+            z-index: 2000;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        .dark #splash-screen {
+            background-color: #1f2937; /* Fondo oscuro */
+        }
+        #splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-800 min-h-screen p-4 sm:p-8">
+<body class="bg-gray-100 dark:bg-gray-800 min-h-screen p-4 sm:p-8 overflow-x-hidden">
+
+    <!-- PANTALLA DE PRECARGA (SPLASH SCREEN) -->
+    <div id="splash-screen">
+        <svg class="w-16 h-16 text-emerald-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <!-- Icono de mancuerna SVG para el splash screen -->
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 6V4a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v2M5 6h4M19 6h-4M5 6l2 2m12-2l-2 2M7 8h10M7 8a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2M12 22a2 2 0 0 0 2-2v-2h-4v2a2 2 0 0 0 2 2z"></path>
+        </svg>
+        <p class="mt-4 text-xl font-semibold text-gray-700 dark:text-gray-200">Cargando Reto 30 Días...</p>
+    </div>
 
     <div class="max-w-4xl mx-auto w-full">
         <!-- Título principal y Botón de Tema -->
@@ -340,6 +375,7 @@
 
         // 3. Elementos del DOM (Interfaz)
         const htmlElement = document.documentElement;
+        const splashScreen = document.getElementById('splash-screen'); // Nuevo elemento
         const themeToggleBtn = document.getElementById('theme-toggle');
         const sunIcon = document.getElementById('sun-icon');
         const moonIcon = document.getElementById('moon-icon');
@@ -926,9 +962,20 @@
             stopBtn.style.display = 'none';
         });
 
+        // Función para ocultar el Splash Screen
+        function hideSplashScreen() {
+             // Retraso para que el usuario pueda ver el splash screen
+            setTimeout(() => {
+                splashScreen.classList.add('hidden');
+            }, 500); // 500ms de retraso después de la carga
+        }
+
 
         window.onload = function() {
-            // 1. Cargar Tema (Modo Oscuro/Claro)
+            // 1. Ocultar Splash Screen
+            hideSplashScreen(); 
+            
+            // 2. Cargar Tema (Modo Oscuro/Claro)
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 htmlElement.classList.add('dark');
@@ -938,7 +985,7 @@
                 updateThemeIcon(false);
             }
 
-            // 2. Inicializar Rutina
+            // 3. Inicializar Rutina
             const today = new Date().toLocaleDateString('es-ES', { weekday: 'long' });
             // Manejo de nombres de días de la semana en español
             let initialDay = "Lunes";
